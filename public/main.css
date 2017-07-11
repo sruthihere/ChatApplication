@@ -1,0 +1,70 @@
+			body{
+			    background: #0d1521;
+			    font-family: tahoma;
+			    color: #989898;
+			}
+			body::-webkit-scrollbar-thumb {
+				 background-color: darkgrey;
+				 outline: 1px solid slategrey;
+			}
+			textarea, input{
+				font: 13px "tahoma", sans-serif;
+				background:#181c22;
+				border: 0;
+			    font-size: 20px;
+			    color: #989898;
+			}
+
+			#contentWrap{
+				max-width:600px;
+				margin-top: 50px;
+				margin-left: 50px;
+
+			}
+			.clear{
+				clear:both;
+			}
+			#chatWrap{
+				width: 450px;
+				float:left;
+				position: relative;
+
+			}
+			#chat-username, #chat-textarea, #chat, #chatMessages{
+				border: 1px solid #bbb;
+				width: 100%;
+				padding: 10px;
+				outline: none;
+			}
+
+			#chat-textarea{
+				height: 50px;
+			}
+			#chatUsers{
+				float:left;
+				margin-left: 20px;
+				width: 110px;
+				padding: 10px;
+				height: 300px;
+				font-weight: 
+			}
+			#chatMessages{
+				height: 300px;
+				overflow-y:scroll;
+				border-top:none;
+				border-bottom:none;
+				background: #090d13;
+			}
+			.chatMessage{
+				margin-bottom: 10px;
+			}
+
+			.whisper{
+				font-style: italic;
+			}
+			#chat-status{
+				width: 100%;
+				padding-top: 10px;
+				background: #0d1521;
+			
+			}

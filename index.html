@@ -1,0 +1,148 @@
+<!Doctype html>
+<html>
+	<head>
+		<title>Chat App</title>
+   
+			<link type="text/css" rel="stylesheet" href="/main.css" />
+	
+		</head>
+		<script
+  src="http://code.jquery.com/jquery-1.12.4.min.js"
+  integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+  crossorigin="anonymous"></script> 	
+	
+	<body>
+
+		<div id="contentWrap">
+			<div id="chatWrap">
+				<input type="text" size="25" id="chat-username" placeholder="Username"></input>
+				<div id="chatMessages">
+
+				</div>
+				<input type="textarea" size="25" id="chat-textarea" placeholder="Message here"></input>
+			</div>
+
+			<div id="chatUsers"></div>
+			<div class="clear"></div>
+			<div id="chat-status">Status: <span>Idle</span></div>
+		</div>
+			
+		<script src="/socket.io/socket.io.js"></script>
+		<script>
+			$(function(){
+
+				
+				//Define a function
+				var getNode = function(val){
+					return document.querySelector(val);
+				}
+				//collect all info
+				var $chatUsername = $("#chat-username");
+				var chatTextarea = getNode("#chat-textarea");
+				var chatStatus = getNode("#chat-status span");
+				var $chatUsers = $("#chatUsers");
+				var $chatMessages = $("#chatMessages");
+
+				var defaultStatus = chatStatus.textContent;
+
+
+				//Define setStatus
+				setStatus = function(val){
+					chatStatus.textContent = val;
+
+					if(val !== defaultStatus){
+						var delay = setTimeout(function(){
+						setStatus(defaultStatus);
+						clearInterval(delay);
+						},3000);
+					}
+				}
+
+				
+				try{
+					var socket = io.connect();
+				}catch(e){
+					console.log("couldnt connect socket.io in the client");
+				}
+				//If you have a valid socket connection
+				if(socket !== "undefined"){
+
+					// Load old messages
+					socket.on('load old messages', function(docs){
+						if(docs.length){// make sure there is data
+							for(var i=docs.length-1; i>=0; i--){
+								displayMessages(docs[i]);
+								//displayUserList(docs[i]);
+							}//for
+
+						}//if	
+					});	
+
+
+					//Recieve usernames
+					socket.on('usernames', function(data){
+						var html = '';
+
+						for(i=0; i<data.length; i++){
+							html += data[i]+'<br/>';
+							}//for
+							$chatUsers.html(html); 
+					});	//socket
+
+					//Status
+					socket.on('status', function(data){
+						//Check if the data is a string or an object
+						setStatus((typeof data === 'object')? data.message: data);
+						if(data.clear === true){
+							textarea.value = '';
+						}
+					});
+
+					//Recieve whisper sent by the server
+					socket.on('whisper', function(data){
+						$chat.append("<span class='whisper'><b>"+data.user+"</b> : "+data.msg+"<br/></span>");
+					});	
+
+
+					//Listen for user keydown
+					chatTextarea.addEventListener("keydown", function(event){
+						var name = $chatUsername.val();
+						//Disable the username input box
+						$("#chat-username").attr("disabled", "disabled"); 
+						//Check if event was just "enter" only
+						if(event.which === 13 && event.shiftKey === false){
+							//User wants to send
+							socket.emit('send message',{name : name, message: this.value }, function(data){
+									if(data !== "undefined"){
+										setStatus(data);
+									}
+
+							});
+							chatTextarea.value = '';
+
+						}//if condition
+					});//event
+
+
+					//Recieve message sent by the server
+					socket.on('new message', function(data){
+						displayMessages(data);
+					});
+
+					//Define displayMessages
+					displayMessages = function(data){
+					$chatMessages.prepend(data.user+" : "+data.msg+"<br>");
+					}
+					//Define displayUserList
+					displayUserList = function(data){
+					$chatUsers.append(data.user+"<br>");
+					}					
+			
+
+				}//if socket
+				
+			});// function
+		</script>
+
+	</body>
+</html>
